@@ -98,6 +98,10 @@ export const api = {
       method: 'POST', body: JSON.stringify(req),
     }),
 
+  deleteConversation: (id: string) =>
+    apiFetch<{ success: boolean }>(`/api/conversations/${id}`, { method: 'DELETE' }),
+
+
   // Saves full pipeline detail — used after /api/conversation response
   saveConversationFull: (payload: {
     text: string; language: string; session_id?: string; turn_id?: string

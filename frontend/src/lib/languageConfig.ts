@@ -33,7 +33,7 @@ export const LANGUAGE_CONFIG: Record<AppLanguage, LangConfig> = {
     aiInstruction: `You are Nuvia, a calm voice-first health support companion.
 Respond naturally in English. Keep spoken responses concise and conversational.
 Do not diagnose. Use careful language: "Based on what you've shared..." Never say "You have [disease]."`,
-    demoPhrase: 'I have had a headache since yesterday and some dizziness today.',
+    demoPhrase: "I am two months pregnant. Since yesterday I have had a headache and my feet are a little swollen. Should I be worried?",
   },
 
   hindi: {
@@ -48,7 +48,7 @@ Respond naturally in Hindi. Use conversational Hindi suitable for spoken audio.
 Keep responses concise and easy to listen to.
 Do not diagnose. Use careful phrases like "Aapne jo bataya uske aadhar par..." 
 Never say "Aapko [bimari] hai." Always respond in Hindi, not English.`,
-    demoPhrase: 'Mujhe kal se sir dard ho raha hai aur aaj thoda chakkar bhi aa raha hai.',
+    demoPhrase: 'Main do mahine ki pregnant hoon. Kal se mujhe sir dard ho raha hai aur mere pair thode sujan gaye hain. Kya mujhe chinta karni chahiye?',
   },
 
   hinglish: {
@@ -64,7 +64,7 @@ Mix Hindi and English naturally. Do not force formal Hindi translations of Engli
 Keep responses short and natural for voice.
 Do not diagnose. Use careful language. Never say "Aapko [bimari] hai."
 Example of good Hinglish response: "Theek hai. Aapko kal se headache hai aur aaj dizziness bhi. Kya yeh pehle bhi hua hai?"`,
-    demoPhrase: 'Mujhe kal se headache ho raha hai aur aaj thoda dizziness bhi hai.',
+    demoPhrase: 'Main do mahine pregnant hoon. Kal se mujhe headache ho raha hai aur mere feet thode swollen hain. Kya mujhe worried hona chahiye?',
   },
 }
 

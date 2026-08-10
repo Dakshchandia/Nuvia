@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageSquare, Mic, Clock, ChevronRight, X, Volume2, Brain, Database } from 'lucide-react'
+import { MessageSquare, Mic, Clock, ChevronRight, X, Volume2, Brain, Database, Trash2 } from 'lucide-react'
 import { api, ConversationRecord } from '../lib/api'
 import { AttentionBadge } from '../components/AttentionBadge'
 import { useNavigate } from 'react-router-dom'
@@ -20,7 +20,7 @@ function formatFull(ts: string) {
   catch { return ts }
 }
 
-function DetailPanel({ conv, onClose }: { conv: ConversationRecord; onClose: () => void }) {
+function DetailPanel({ conv, onClose, onDelete }: { conv: ConversationRecord; onClose: () => void; onDelete: (id: string) => void }) {
   return (
     <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 24 }}
       className="w-full h-full bg-white overflow-y-auto flex flex-col"
@@ -30,7 +30,10 @@ function DetailPanel({ conv, onClose }: { conv: ConversationRecord; onClose: () 
           <p className="text-[11px] text-nuvia-subtle uppercase tracking-widest font-semibold">Conversation detail</p>
           <p className="font-bold text-sm mt-0.5" style={{ color: '#1a1008' }}>Voice session</p>
         </div>
-        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-nuvia-surface text-nuvia-muted hover:text-nuvia-text transition-colors"><X size={16} /></button>
+        <div className="flex items-center gap-1">
+          <button onClick={() => onDelete(conv.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors" title="Delete conversation"><Trash2 size={16} /></button>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-nuvia-surface text-nuvia-muted hover:text-nuvia-text transition-colors"><X size={16} /></button>
+        </div>
       </div>
       <div className="p-5 space-y-4 flex-1">
         <div className="flex items-center gap-3 flex-wrap">
@@ -104,6 +107,16 @@ export function ConversationsPage() {
     api.conversations().then(setConvs).catch(() => setConvs([])).finally(() => setLoading(false))
   }, [])
 
+  const handleDelete = async (id: string) => {
+    try {
+      await api.deleteConversation(id);
+      setConvs(prev => prev.filter(c => c.id !== id));
+      if (selected?.id === id) setSelected(null);
+    } catch (e) {
+      console.error('Failed to delete conversation', e);
+    }
+  };
+
   return (
     <div className="h-full flex flex-col lg:flex-row overflow-hidden" style={{ background: '#f7f3ee' }}>
       <div className={`flex-1 overflow-y-auto ${selected ? 'hidden lg:flex lg:flex-col' : 'flex flex-col'}`}>
@@ -158,7 +171,7 @@ export function ConversationsPage() {
       <AnimatePresence>
         {selected && (
           <div className="lg:w-96 lg:border-l lg:border-nuvia-border overflow-hidden flex-shrink-0 bg-white">
-            <DetailPanel conv={selected} onClose={() => setSelected(null)} />
+            <DetailPanel conv={selected} onClose={() => setSelected(null)} onDelete={handleDelete} />
           </div>
         )}
       </AnimatePresence>

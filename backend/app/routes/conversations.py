@@ -106,3 +106,11 @@ async def save_conversation_full(payload: dict):
     }
     _store.insert(0, record)
     return {"success": True, "id": record["id"]}
+
+@router.delete("/conversations/{conversation_id}")
+async def delete_conversation(conversation_id: str):
+    for i, c in enumerate(_store):
+        if c.get("id") == conversation_id:
+            del _store[i]
+            return {"success": True}
+    return {"success": False, "error": "Not found"}
