@@ -65,21 +65,20 @@ class ExtractedSymptom(BaseModel):
 
 
 class AIUnderstanding(BaseModel):
-    understood: List[ExtractedSymptom] = Field(default_factory=list)
-    current_concern: Optional[str] = None
-    duration: Optional[str] = None
-    timing: Optional[str] = None
+    intent: str
     keywords: List[str] = Field(default_factory=list)
-    language: Optional[str] = None
-    is_health_related: bool = True        # NEW: detect casual conversation
+    is_health_related: bool = True
 
 
 class AIContextualResponse(BaseModel):
-    question: str
+    intent: str
+    understanding: str
+    response: str
+    question: Optional[str] = None
     attention_level: str
-    guidance: str
+    guidance: Optional[str] = None
     why: List[str] = Field(default_factory=list)
-    summary: Dict[str, Any] = Field(default_factory=dict)
+    emergency: bool = False
 
 
 # ── Latency telemetry ─────────────────────────────────────────────────────────
@@ -107,15 +106,17 @@ class ConversationEvent(BaseModel):
 # ── Full conversation response ────────────────────────────────────────────────
 
 class ConversationResponse(BaseModel):
-    understood: List[UnderstoodItem]
+    intent: str
+    understanding: str
     memories: List[MemoryItem]
-    question: str
+    response: str
+    question: Optional[str] = None
     attention_level: AttentionLevel
-    guidance: str
+    guidance: Optional[str] = None
     why: List[str]
     summary: Dict[str, Any]
     demo_retrieval: bool
-    ai_powered: bool = False
+    ai_powered: bool = True
     session_id: Optional[str] = None
     turn_id: Optional[str] = None
     latency: Optional[TurnLatency] = None
@@ -164,7 +165,9 @@ class ConversationRecord(BaseModel):
     timestamp: str
     attention_level: str
     # Rich detail stored so detail panel works with real data
-    understood: Optional[List[Dict[str, str]]] = None
+    intent: Optional[str] = None
+    understanding: Optional[str] = None
+    response: Optional[str] = None
     question: Optional[str] = None
     guidance: Optional[str] = None
     memories_used: Optional[List[str]] = None

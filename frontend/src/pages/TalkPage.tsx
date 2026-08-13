@@ -93,8 +93,9 @@ export function TalkPage() {
       try {
         const hr = await api.historyQuery(txt, language, 'demo_user')
         const ans = hr.spoken_answer || hr.answer
-        setResp({ understood:[{label: language==='hindi'?'इतिहास प्रश्न':'History query', detail:txt.substring(0,50)}],
-          memories:[], question:ans, attention_level:'LOW', guidance:hr.answer,
+        setResp({ intent: language==='hindi'?'इतिहास प्रश्न':'History query', understanding: txt.substring(0,50),
+          response: ans, question: '',
+          memories:[], attention_level:'LOW', guidance:hr.answer,
           why:[`Found ${hr.memories_found} memory(s)`], summary:{}, demo_retrieval:false,
           ai_powered:false, is_health_related:false })
         setStep('guidance'); setOrb('idle'); setLoading(false)
@@ -114,7 +115,7 @@ export function TalkPage() {
       setResp(r); setStep('understood'); setOrb('idle')
       if (r.latency) setLatency({ ...r.latency, stt_ms: sttMs ?? undefined })
       api.saveConversationFull({ text:txt, language, session_id:r.session_id, turn_id:r.turn_id,
-        attention_level:r.attention_level, understood:r.understood, question:r.question,
+        attention_level:r.attention_level, intent:r.intent, understanding:r.understanding, response:r.response, question:r.question,
         guidance:r.guidance, memories_used:r.memories.map(m=>m.content) }).catch(()=>{})
     } catch {
       setApiErr(t('error.connection', language))
@@ -126,7 +127,7 @@ export function TalkPage() {
 
   const handleSpeak = async () => {
     if (!resp) return
-    const txt = `${resp.question}. ${resp.guidance}`
+    const txt = resp.response
     setOrb('speaking')
     const rimeStart = Date.now()
     try {
@@ -291,18 +292,17 @@ export function TalkPage() {
                 </div>
                 <div className="p-5">
                   {resp.is_health_related===false ? (
-                    <p className="text-nuvia-muted text-sm">{resp.question}</p>
+                    <p className="text-nuvia-muted text-sm">{resp.response}</p>
                   ) : (
-                    <div className="grid grid-cols-2 gap-2.5 mb-4">
-                      {resp.understood.map((u,i)=>(
-                        <motion.div key={u.label} initial={{opacity:0,scale:0.95}} animate={{opacity:1,scale:1}} transition={{delay:i*0.08}}
-                          className="p-3.5 rounded-xl border"
-                          style={{background:i%2===0?'#fdf0f0':'#f0f7f0',borderColor:i%2===0?'rgba(74,31,31,0.12)':'rgba(61,107,74,0.12)'}}
-                        >
-                          <p className="font-semibold text-sm" style={{color:i%2===0?'#4a1f1f':'#2d5a3a'}}>{u.label}</p>
-                          <p className="text-nuvia-muted text-xs mt-0.5">{u.detail}</p>
-                        </motion.div>
-                      ))}
+                    <div className="mb-4 space-y-4">
+                      <div className="p-4 rounded-xl border bg-nuvia-surface border-nuvia-border/60">
+                        <p className="font-semibold text-sm" style={{color:'#4a1f1f'}}>{resp.intent}</p>
+                        <p className="text-nuvia-muted text-sm mt-1">{resp.understanding}</p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[11px] font-black mt-0.5 orb-warm" style={{color:'#fff'}}>N</div>
+                        <div className="bubble-nuvia flex-1 text-sm">{resp.response}</div>
+                      </div>
                     </div>
                   )}
                   {step==='understood' && resp.is_health_related!==false && (
@@ -364,10 +364,12 @@ export function TalkPage() {
                     <span className="text-[11px] font-bold uppercase tracking-widest" style={{color:'#4a1f1f'}}>{t('step3.title',language)}</span>
                   </div>
                   <div className="p-5 space-y-5">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[11px] font-black mt-0.5 orb-warm" style={{color:'#fff'}}>N</div>
-                      <div className="bubble-nuvia flex-1">{resp.question}</div>
-                    </div>
+                    {resp.question && (
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[11px] font-black mt-0.5 orb-warm" style={{color:'#fff'}}>?</div>
+                        <div className="bg-orange-50 text-orange-900 border border-orange-100 p-3 rounded-xl rounded-tl-none flex-1 text-sm">{resp.question}</div>
+                      </div>
+                    )}
                     <div className="border-t border-nuvia-border pt-4">
                       <p className="text-[10px] font-bold uppercase tracking-widest text-nuvia-subtle mb-2">{t('step3.supportLevel',language)}</p>
                       <div className="flex items-center gap-3 flex-wrap">
@@ -375,16 +377,18 @@ export function TalkPage() {
                         <span className="flex items-center gap-1.5 text-xs text-nuvia-subtle"><Shield size={10}/>{t('step3.notDiagnosis',language)}</span>
                       </div>
                     </div>
-                    <div className="border-t border-nuvia-border pt-4">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-nuvia-subtle mb-2">{t('step3.guidance',language)}</p>
-                      <p className="text-sm text-nuvia-muted leading-relaxed">{resp.guidance}</p>
-                      {resp.attention_level==='URGENT' && (
-                        <div className="mt-3 flex items-start gap-2 p-3 rounded-xl border border-red-200 bg-red-50">
-                          <AlertTriangle size={13} className="text-red-500 flex-shrink-0 mt-0.5"/>
-                          <p className="text-red-700 text-xs">{t('step3.urgent',language)}</p>
-                        </div>
-                      )}
-                    </div>
+                    {resp.guidance && (
+                      <div className="border-t border-nuvia-border pt-4">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-nuvia-subtle mb-2">{t('step3.guidance',language)}</p>
+                        <p className="text-sm text-nuvia-muted leading-relaxed">{resp.guidance}</p>
+                        {resp.attention_level==='URGENT' && (
+                          <div className="mt-3 flex items-start gap-2 p-3 rounded-xl border border-red-200 bg-red-50">
+                            <AlertTriangle size={13} className="text-red-500 flex-shrink-0 mt-0.5"/>
+                            <p className="text-red-700 text-xs">{t('step3.urgent',language)}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     {resp.why.length>0 && (
                       <div className="border-t border-nuvia-border pt-4">
                         <p className="text-[10px] font-bold uppercase tracking-widest text-nuvia-subtle mb-2">{t('step3.why',language)}</p>

@@ -23,11 +23,13 @@ export interface TurnLatency {
 }
 
 export interface ConversationResponse {
-  understood: UnderstoodItem[]
+  intent: string
+  understanding: string
   memories: MemoryItem[]
-  question: string
-  attention_level: 'LOW' | 'NEEDS ATTENTION' | 'URGENT'
-  guidance: string
+  response: string
+  question?: string
+  attention_level: 'LOW' | 'WATCH' | 'ELEVATED' | 'URGENT'
+  guidance?: string
   why: string[]
   summary: Record<string, unknown>
   demo_retrieval: boolean
@@ -52,7 +54,7 @@ export interface StatusResponse {
 export interface ConversationRecord {
   id: string; preview: string; full_text: string
   language: string; timestamp: string; attention_level: string
-  understood?: { label: string; detail: string }[]
+  intent?: string; understanding?: string; response?: string
   question?: string; guidance?: string
   memories_used?: string[]; session_id?: string; turn_id?: string
 }
@@ -105,8 +107,8 @@ export const api = {
   // Saves full pipeline detail — used after /api/conversation response
   saveConversationFull: (payload: {
     text: string; language: string; session_id?: string; turn_id?: string
-    attention_level: string; understood: UnderstoodItem[]
-    question: string; guidance: string; memories_used: string[]
+    attention_level: string; intent: string; understanding: string; response: string
+    question?: string; guidance?: string; memories_used: string[]
   }) =>
     apiFetch<{ success: boolean; id: string }>('/api/conversations/full', {
       method: 'POST', body: JSON.stringify(payload),
