@@ -28,7 +28,7 @@ export interface ConversationResponse {
   memories: MemoryItem[]
   response: string
   question?: string
-  attention_level: 'LOW' | 'WATCH' | 'ELEVATED' | 'URGENT'
+  attention_level: 'LOW' | 'NEEDS ATTENTION' | 'URGENT'
   guidance?: string
   why: string[]
   summary: Record<string, unknown>

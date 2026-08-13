@@ -45,21 +45,15 @@ function DetailPanel({ conv, onClose, onDelete }: { conv: ConversationRecord; on
           <p className="text-[11px] font-bold text-nuvia-subtle uppercase tracking-widest mb-2">You said</p>
           <p className="text-sm leading-relaxed" style={{ color: '#1a1008' }}>{conv.full_text}</p>
         </div>
-        {conv.understood && conv.understood.length > 0 && (
+        {conv.intent && conv.understanding && (
           <div className="p-4 rounded-2xl border border-nuvia-border bg-white">
             <div className="flex items-center gap-2 mb-3">
               <Brain size={13} style={{ color: '#4a1f1f' }} />
               <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: '#4a1f1f' }}>What Nuvia understood</p>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              {conv.understood.map((u, i) => (
-                <div key={u.label} className="p-3 rounded-xl border"
-                  style={{ background: i % 2 === 0 ? '#fdf0f0' : '#f0f7f0', borderColor: i % 2 === 0 ? 'rgba(74,31,31,0.12)' : 'rgba(61,107,74,0.12)' }}
-                >
-                  <p className="font-semibold text-xs" style={{ color: i % 2 === 0 ? '#4a1f1f' : '#2d5a3a' }}>{u.label}</p>
-                  <p className="text-nuvia-muted text-xs mt-0.5">{u.detail}</p>
-                </div>
-              ))}
+            <div className="p-3 rounded-xl border" style={{ background: '#fdf0f0', borderColor: 'rgba(74,31,31,0.12)' }}>
+              <p className="font-semibold text-xs" style={{ color: '#4a1f1f' }}>{conv.intent}</p>
+              <p className="text-nuvia-muted text-xs mt-0.5">{conv.understanding}</p>
             </div>
           </div>
         )}
